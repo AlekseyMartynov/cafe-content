@@ -49,7 +49,7 @@ func streamMpeg(res http.ResponseWriter, req *http.Request) {
 	h.Set("Content-Type", "audio/mpeg")
 
 	section := io.NewSectionReader(mpegFile, mpegPos, mpegSize-mpegPos)
-	rated := newBlockingRatedReader(section, 16384, 15)
+	rated := newBlockingRatedReader(section, 16384, 70)
 	http.ServeContent(res, req, "audio.mp3", time.Time{}, rated)
 }
 
