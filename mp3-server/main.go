@@ -37,9 +37,9 @@ func streamMpeg(res http.ResponseWriter, req *http.Request) {
 		startSecond = 0
 	}
 
-	mpegPos := posFromToc(tocPath, startSecond)
+	mpegPos, secondsLeft := posFromToc(tocPath, startSecond)
 	mpegSize := mpegFileInfo.Size()
-	if mpegPos < 0 || mpegPos > mpegSize {
+	if mpegPos < 0 || mpegPos > mpegSize || secondsLeft < 1 {
 		http.NotFound(res, req)
 		return
 	}
@@ -49,7 +49,7 @@ func streamMpeg(res http.ResponseWriter, req *http.Request) {
 	h.Set("Content-Type", "audio/mpeg")
 
 	section := io.NewSectionReader(mpegFile, mpegPos, mpegSize-mpegPos)
-	rated := newBlockingRatedReader(section, 16384, 70)
+	rated := newBlockingRatedReader(prependXingHeader(section, secondsLeft), 16384, 70)
 	http.ServeContent(res, req, "audio.mp3", time.Time{}, rated)
 }
 
@@ -59,10 +59,15 @@ func formatPaths(vars map[string]string) (mpegPath string, tocPath string) {
 	return path.Join(prefix, chapter+".mp3"), path.Join(prefix, "toc_"+chapter)
 }
 
-func posFromToc(tocPath string, startSecond int) int64 {
+func posFromToc(tocPath string, startSecond int) (pos int64, secondsLeft int) {
 	file, fileError := os.Open(tocPath)
 	if fileError != nil {
-		return -1
+		return -1, -1
+	}
+
+	stat, statError := file.Stat()
+	if statError != nil {
+		return -1, -1
 	}
 
 	defer file.Close()
@@ -72,10 +77,10 @@ func posFromToc(tocPath string, startSecond int) int64 {
 	readError := binary.Read(section, binary.LittleEndian, &readResult)
 
 	if readError != nil {
-		return -1
+		return -1, -1
 	}
 
-	return int64(readResult)
+	return int64(readResult), int(stat.Size()/4) - startSecond
 }
 
 func main() {
