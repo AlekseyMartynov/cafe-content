@@ -1,4 +1,4 @@
-FROM buildpack-deps:stretch-curl
+FROM buildpack-deps:buster-curl
 
 # https://yandex.ru/support/disk/cli-clients.xml#cli-install
 # sudo removed
