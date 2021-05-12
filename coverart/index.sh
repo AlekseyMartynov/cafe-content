@@ -10,7 +10,7 @@ try_url() {
     fi
 }
 
-try_url `curl -Lfs https://www.shazam.com/discovery/v5/-/RU/web/-/track/$SHID | jq -r .images.coverart | sed -r 's/_s[0-9]+/_s0/'`
+try_url `curl -Lfs https://www.shazam.com/discovery/v5/-/RU/web/-/track/$SHID | jq -r .images.coverarthq | sed -r 's/[0-9]{3}x[0-9]{3}cc/600x600cc-95/'`
 
 echo "Status: 500"
 echo "Content-Type: text/plain"
