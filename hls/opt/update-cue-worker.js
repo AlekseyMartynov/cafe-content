@@ -20,8 +20,7 @@ while(startIndex >= 0) {
     startIndex--;
 }
 
-// HLS playlist duration + 1 segment
-const INITIAL_DELAY = 2 * (5 + 1);
+const INITIAL_DELAY = 10 * 3 + 5;
 
 const lines = [ "sleep " + INITIAL_DELAY, "" ];
 let prevSectionTime;

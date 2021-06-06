@@ -81,7 +81,7 @@ function log(message) {
 }
 
 function chooseTimebase() {
-    const defaultTimebase = Math.round(Date.now() / 1000);
+    const defaultTimebase = Math.round(Date.now() / 1000) + (10 * 3);
     log("Default timebase: " + defaultTimebase);
 
     const savedTimebase = Number(fs.existsSync(TIMEBASE_PATH) ? fs.readFileSync(TIMEBASE_PATH, "utf-8") : 0);
